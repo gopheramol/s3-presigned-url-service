@@ -1,0 +1,69 @@
+package client
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/gopheramol/s3-presigned-url-service/configuration"
+	"github.com/gopheramol/s3-presigned-url-service/model"
+)
+
+type S3Client interface {
+	GeneratePresignedURL(ctx context.Context, req model.PreSignedURLRequest) (URL string, err error)
+}
+
+type s3Client struct {
+	config configuration.HandlerServiceConfig
+}
+
+func NewS3Client(
+	config configuration.HandlerServiceConfig,
+) S3Client {
+	return s3Client{config: config}
+}
+
+// GeneratePresignedURL generates a presigned URL for accessing an S3 object.
+func (client s3Client) GeneratePresignedURL(ctx context.Context, req model.PreSignedURLRequest) (URL string, err error) {
+
+	// 	regionName := client.config.AWSRegion
+	// 	cfg, err := newConfig(regionName)
+	// 	if err != nil {
+	// 		//log.Fatalf("not able to load aws config", err)
+	// 		return
+	// 	}
+
+	// 	URL, err = putPresignURL(cfg, req)
+	// 	if err != nil {
+	// 		log.Fatalf("not able get pre signed url: %+v", err)
+	// 	}
+	// 	return
+	// }
+
+	// func newConfig(regionName string) (cfg aws.Config, err error) {
+	// 	cfg, err = config.LoadDefaultConfig(context.Background(),
+	// 		config.WithRegion(regionName))
+	// 	return
+	// }
+
+	// func putPresignURL(cfg aws.Config, req model.PreSignedURLRequest) (url string, err error) {
+	// 	s3client := s3.NewFromConfig(cfg)
+	// 	presignClient := s3.NewPresignClient(s3client)
+	// 	presignedUrl, err := presignClient.PresignPutObject(context.Background(),
+	// 		&s3.PutObjectInput{
+	// 			Bucket: aws.String(req.BucketName),
+	// 			Key:    aws.String(req.File),
+	// 		},
+	// 		s3.WithPresignExpires(time.Minute*15)) // take it from app config
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 		return
+	// 	}
+	// 	url = presignedUrl.URL
+	// 	return
+
+}
