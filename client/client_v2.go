@@ -30,6 +30,7 @@ func NewS3Client(
 // GeneratePresignedURL generates a presigned URL for accessing an S3 object.
 func (client s3Client) GeneratePresignedURL(ctx context.Context, req model.PreSignedURLRequest) (URL string, err error) {
 
+	expiry := client.config.Expiry
 	regionName := client.config.AWSRegion
 	secretKey := client.config.SecretKey
 	accessKey := client.config.AccessKey
@@ -43,22 +44,23 @@ func (client s3Client) GeneratePresignedURL(ctx context.Context, req model.PreSi
 		return
 	}
 
-	URL, err = putPresignURL(cfg, req)
+	URL, err = putPresignURL(cfg, req, expiry)
 	if err != nil {
 		log.Fatalf("not able get pre signed url: %+v", err)
 	}
 	return
 }
 
-func putPresignURL(cfg aws.Config, req model.PreSignedURLRequest) (url string, err error) {
+func putPresignURL(cfg aws.Config, req model.PreSignedURLRequest, expiry time.Duration) (url string, err error) {
 	s3client := s3.NewFromConfig(cfg)
 	presignClient := s3.NewPresignClient(s3client)
+
 	presignedUrl, err := presignClient.PresignPutObject(context.Background(),
 		&s3.PutObjectInput{
 			Bucket: aws.String(req.BucketName),
 			Key:    aws.String(req.File),
 		},
-		s3.WithPresignExpires(time.Minute*15)) // take it from app config
+		s3.WithPresignExpires(expiry))
 	if err != nil {
 		log.Fatal(err)
 		return
